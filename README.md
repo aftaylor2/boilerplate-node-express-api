@@ -9,11 +9,22 @@ The aim of this project is to save engineers hours to days of development time, 
 ## Features
 
 - ECMAScript Modules (ESM): Modern JavaScript syntax and module system.
+- Built in internal health and status check endpoints that ensure the database connection pool remains connected, and that the server is able to respond to pings, and process HTTP requests.
+- Authentication and Authorization using JWT (JSON Web Tokens).
+- Easily add auth protection on selected routes or allow for unauthenticated access to public routes.
 - Database Flexibility: Offers the ability to choose between MongoDB, PostgreSQL, or SQLite using dependency injection, providing versatility in database integration and management. Automatically installs and imports ONLY the dependencies you decide to use.
-- Flexible Logging: Choose between Pino and Morgan for your logging needs. Only installs and imports the selected logging dependency.
+- Flexible Logging: Choose *Pino* or *Morgan* for your logging needs. Only installs and imports the selected logging dependency.
 - Dynamic Route Importing: Automatically import routes from the routes directory based on filenames, or configure them traditionally.
-- Docker Ready: Containerize your API with ease for deployment and scalability.
+- The API supports pagination, limits, selects, and various search options via HTTP query params that are automatically converted into queries for the configured database.
+- Docker Ready: Containerize your API with ease for deployment and scalability. Supports graceful shutdowns.
 - Kubernetes Compatible: Deploy on Kubernetes platforms like Google Kubernetes Engine (GKE) without hassle.
+- Kubernetes Cronjobs: Easily create, schedule, and execute kubernetes cronjobs.
+- Google Cloud Automations: Scripts to allow the automatic creation of configurable uptime checks and service monitoring for deployed projects.
+
+### Optional Features
+
+- Email Support: Select your email provider (GMAIL IMAP, SendGrid API, SMTP Server), and configure your API credentials and be ready to send emails within minutes.
+- 
 
 ## Getting Started
 
@@ -59,6 +70,10 @@ Place your route files in the routes directory and manually import them in app.j
 ### Dynamic Route Importing
 
 Simply add your route files to the routes directory. The naming convention is /[routeName].js, and the will be automatically imported and hosted as "/[routeName]".
+
+## Logging
+
+Choose your logging engine by setting the LOGGER environment variable.  Use the CLI to quickly change the variable for testing, or use the .env file to configure per environment. Choose pino if you require JSON logs.
 
 ## Dockerization
 
