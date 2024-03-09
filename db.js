@@ -1,11 +1,10 @@
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import path from 'path';
 import url from 'url';
 
 // ESM AppRoot
-const appRoot = url.fileURLToPath(import.meta.url).split('db.mjs')[0];
-
+const appRoot = url.fileURLToPath(import.meta.url).split('db.js')[0];
+console.log(appRoot)
 const getENV = () =>
   process.env?.NODE_ENV?.trim()?.toLowerCase() === 'production'
     ? '.env'
