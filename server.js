@@ -1,5 +1,4 @@
 import express from 'express';
-import { createServer } from 'http';
 import stoppable from 'stoppable';
 import mongoSanitize from 'express-mongo-sanitize';
 import helmet from 'helmet';
@@ -7,9 +6,11 @@ import xss from 'xss-clean';
 import hpp from 'hpp';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+
+import { createServer } from 'http';
 import { readdir } from 'fs/promises';
 import { fileURLToPath } from 'url';
-import path from 'path';
 
 import errorHandler from './middleware/error.js';
 import connectDB from './db.js';
