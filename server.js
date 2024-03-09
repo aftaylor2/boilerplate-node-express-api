@@ -1,5 +1,4 @@
 import express from 'express';
-import morgan from 'morgan';
 import { createServer } from 'http';
 import stoppable from 'stoppable';
 import mongoSanitize from 'express-mongo-sanitize';
@@ -14,11 +13,13 @@ import path from 'path';
 
 import errorHandler from './middleware/error.js';
 import connectDB from './db.js';
+
+import { createLogger } from './utils/logger.js';
 import getIPAddr from './utils/network.js';
 
 dotenv.config({ path: '.env' });
 
-const {APP_NAME, NODE_ENV, TZ} = process.env;
+const {APP_NAME, NODE_ENV, TZ, LOGGER} = process.env;
 
 const ipAddr = getIPAddr('IPv4');
 const PORT = process.env.PORT || 3000;
@@ -34,12 +35,14 @@ const app = express();
 const server = stoppable(createServer(app));
 const ts = () => new Date().toISOString();
 
+createLogger(app, LOGGER); // Should we use the await ?
+
+app.use(errorHandler);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-morgan.token('date', () => new Date().toISOString());
-
-app.use(morgan((tokens, req, res) => morganSettings(tokens, req, res)));
+// Load security related dependencies
 app.use(mongoSanitize());
 app.use(helmet());
 app.use(xss());
@@ -51,16 +54,17 @@ app.use((_req, res, next) => {
   next();
 });
 
+// Create route aliases
 app.use('/', kubernetes);
 
-app.use(errorHandler);
 
 // Dynamically load route files
 loadRoutes(app).catch(console.error);
 
+// Initialize Server
 app.listen(PORT, () => outputServerInfo());
 
-// Signal handling
+// Signal handling for graceful shutdowns
 process.on('SIGINT', () => shutdown('SIGINT'));
 process.on('SIGTERM', () => shutdown('SIGTERM'));
 process.on('unhandledRejection', (err, promise) => shutdown(null, err, promise));
@@ -69,10 +73,8 @@ process.on('unhandledRejection', (err, promise) => shutdown(null, err, promise))
 function shutdown(signal, error = null, promise = null) {
   const ts = () => new Date().toISOString(); 
 
-  if (signal) {
-    console.log(`${ts()} Received ${signal}. Graceful shutdown…`);
-  }
-
+  if (signal) console.log(`${ts()} Received ${signal}. Graceful shutdown…`);
+  
   // Handle unhandled rejection if error is provided
   if (error) {
     console.error(`Unhandled Error: ${error.message}`);
@@ -92,39 +94,6 @@ function shutdown(signal, error = null, promise = null) {
     process.exit(0); // If 0 errors occured, successful graceful shutdown
     
   });
-}
-
-function morganSettings(tokens, req, res) {
-  const userEmail = req.user?.email ?? 'unauth';
-
-  // Simple / Standard Tokens
-  const tokensArr = ['date', 'method', 'url', 'status', 'referrer'];
-
-  // Tokens requiring additional options
-  const complexTokensArr = [
-    { name: 'res', arg: 'content-length' },
-    { name: 'response-time', suffix: 'ms' },
-  ];
-
-  // Map simple tokens to their values
-  const simpleTokens = tokensArr.map(token => tokens[token](req, res));
-
-  // Map complex tokens to their values, handling any additional arguments or suffixes
-  const complexTokens = complexTokensArr.map(({ name, arg, suffix }) => 
-    `${tokens[name](req, res, arg) || ''}${suffix || ''}`.trim()
-  );
-
-  // Handle the IPv4-mapped IPv6 address, removing the prefix
-  const remoteAddr = tokens['remote-addr'](req, res).replace(/^::ffff:/, '');
-
-  // Combine all tokens into a single array
-  return [
-   remoteAddr,
-    ...simpleTokens,
-    '-',
-    ...complexTokens,
-   `[${userEmail}]`,
-  ].join(' ');
 }
 
 function generateResponseHeaders(){
