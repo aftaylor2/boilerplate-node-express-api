@@ -4,7 +4,7 @@ import url from 'url';
 
 // ESM AppRoot
 const appRoot = url.fileURLToPath(import.meta.url).split('db.js')[0];
-console.log(appRoot)
+
 const getENV = () =>
   process.env?.NODE_ENV?.trim()?.toLowerCase() === 'production'
     ? '.env'
