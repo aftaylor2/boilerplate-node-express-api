@@ -1,0 +1,86 @@
+###################
+#     Config      #
+###################
+package-lock.json
+*.env
+
+
+###################
+#   Directories   #
+###################
+node_modules/
+logs/
+
+######################
+#    Certificates    #
+######################
+*.pfx
+*.pem
+*.key
+*.crt
+*.p12
+*.p8
+
+######################
+# OS generated files #
+######################
+*._*
+._*
+.*
+.DS_Store
+._.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+############
+# Packages #
+############
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.pkg
+
+###################
+# Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.pyc
+*.py[co]
+
+######################
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
+
+######################
+# Editor Backup File #
+######################
+*~
+*.bak
+*.swp
+*.swo
+
+
+####################################
+# DO NOT IGNORE THESE CONFIG FILES #
+####################################
+!.eslintrc.js
+!.eslintignore
+!.gitignore
+!.vscodeignore
+
