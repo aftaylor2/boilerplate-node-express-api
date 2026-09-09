@@ -20,10 +20,6 @@ RUN npm ci --omit=dev && npm cache clean --force
 ###############################################################################
 FROM node:24-alpine AS runtime
 
-# tini reaps zombies and forwards signals to node, so the SIGTERM/SIGINT
-# handlers in server.js run on `docker stop`.
-RUN apk add --no-cache tini
-
 WORKDIR /app
 
 ENV NODE_ENV=production \
@@ -49,5 +45,10 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||3000)+'/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 
-ENTRYPOINT ["/sbin/tini", "--"]
+# Exec form, so node is PID 1 and receives SIGTERM directly — server.js:69-70
+# install handlers, which is what exempts it from the "PID 1 ignores unhandled
+# signals" rule. No init shim needed: the app spawns no child processes, so
+# there are no zombies to reap. Do NOT change this to shell form or to
+# `npm run start` — the shell/npm would stay PID 1 and swallow the signal.
+# If an init is ever wanted, `docker run --init` supplies one.
 CMD ["node", "server.js"]
