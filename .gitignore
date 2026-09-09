@@ -83,4 +83,5 @@ Thumbs.db
 !.eslintignore
 !.gitignore
 !.vscodeignore
+!.env.example
 
