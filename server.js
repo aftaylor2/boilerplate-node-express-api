@@ -63,7 +63,7 @@ app.use('/', kubernetes);
 loadRoutes(app).catch(console.error);
 
 // Initialize Server
-app.listen(PORT, () => outputServerInfo());
+server.listen(PORT, () => outputServerInfo());
 
 // Signal handling for graceful shutdowns
 process.on('SIGINT', () => shutdown('SIGINT'));
